@@ -1,0 +1,188 @@
+# NFHS-5 Karnataka Distribution Parameters
+# Source: National Family Health Survey 5 (2019-21), Karnataka State Fact Sheet
+# Used for synthetic data generation
+
+nfhs5_karnataka:
+  survey_year: "2019-21"
+  state: "Karnataka"
+  source_url: "http://rchiips.org/nfhs/factsheet_NFHS-5.shtml"
+
+  # ─── DEMOGRAPHICS ─────────────────────────────────────────────────────────
+  demographics:
+    women_age_15_49:
+      distribution: "uniform"
+      min: 15
+      max: 49
+    children_age_months:
+      distribution: "uniform"
+      min: 0
+      max: 59
+    rural_urban_split:
+      rural: 0.613
+      urban: 0.387
+    literacy_rate_women: 0.738
+    scheduled_caste_tribe_proportion: 0.244
+
+  # ─── NUTRITION ────────────────────────────────────────────────────────────
+  nutrition:
+    women_bmi:
+      underweight_bmi_lt18_5: 0.212       # <18.5
+      normal_bmi_18_5_to_24_9: 0.521
+      overweight_bmi_25_to_29_9: 0.168
+      obese_bmi_gte30: 0.099
+      mean: 21.8
+      std: 4.2
+    children_under5:
+      stunting_prevalence: 0.354           # Height-for-age <-2SD
+      wasting_prevalence: 0.197            # Weight-for-height <-2SD
+      underweight_prevalence: 0.321        # Weight-for-age <-2SD
+      overweight_prevalence: 0.023
+
+  # ─── ANAEMIA ──────────────────────────────────────────────────────────────
+  anaemia:
+    women_15_49:
+      any_anaemia: 0.478                   # Hb < 12 g/dL
+      mild: 0.261                          # Hb 10–11.9 g/dL
+      moderate: 0.196                      # Hb 7–9.9 g/dL
+      severe: 0.021                        # Hb < 7 g/dL
+      mean_hb_normal: 12.8
+      std_hb_normal: 1.4
+      mean_hb_anaemic: 9.6
+      std_hb_anaemic: 1.8
+    children_6_59_months:
+      any_anaemia: 0.651
+      mean_hb: 10.2
+      std_hb: 1.6
+
+  # ─── MATERNAL HEALTH ──────────────────────────────────────────────────────
+  maternal_health:
+    anc_visits:
+      no_anc: 0.031
+      less_than_4: 0.241
+      four_or_more: 0.728                  # ANC 4+ coverage
+    institutional_delivery: 0.947
+    c_section_rate: 0.269
+    postnatal_care_mother_48h: 0.794
+    postnatal_care_newborn_48h: 0.771
+    full_antenatal_care: 0.212             # All 4 components
+    avg_birth_interval_months:
+      mean: 34.2
+      std: 18.6
+    pregnancy_complications:
+      hypertension: 0.083
+      gestational_diabetes: 0.042
+      anaemia_severe: 0.031
+
+  # ─── IMMUNIZATION (Children 12–23 months) ─────────────────────────────────
+  immunization:
+    fully_immunized: 0.652
+    no_vaccination: 0.013
+    bcg: 0.971
+    measles_rubella_1: 0.893
+    dpt3: 0.812
+    opv3: 0.834
+    hepatitis_b3: 0.782
+    vitamin_a_supplementation: 0.581
+    vaccination_card_seen: 0.712
+    # Age in days for vaccine schedule
+    bcg_days: {mean: 3, std: 5}
+    opv0_days: {mean: 3, std: 5}
+    dpt1_days: {mean: 48, std: 14}
+    dpt2_days: {mean: 76, std: 14}
+    dpt3_days: {mean: 104, std: 14}
+    measles1_days: {mean: 275, std: 21}
+
+  # ─── BLOOD PRESSURE / HYPERTENSION ──────────────────────────────────────
+  blood_pressure:
+    hypertension_women: 0.105              # BP ≥ 140/90
+    hypertension_men: 0.156
+    sbp_normal: {mean: 112.4, std: 14.2}
+    dbp_normal: {mean: 72.8, std: 9.6}
+    sbp_hypertensive: {mean: 152.3, std: 18.4}
+    dbp_hypertensive: {mean: 96.4, std: 11.2}
+    on_medication: 0.412                   # Among hypertensives
+
+  # ─── DIABETES ─────────────────────────────────────────────────────────────
+  diabetes:
+    prevalence_women: 0.098
+    fasting_glucose_normal: {mean: 88.4, std: 10.2}
+    fasting_glucose_diabetic: {mean: 162.8, std: 42.6}
+
+  # ─── FAMILY PLANNING ──────────────────────────────────────────────────────
+  family_planning:
+    modern_contraceptive_prevalence: 0.602
+    female_sterilization: 0.488
+    iud: 0.024
+    condom: 0.042
+    oral_pills: 0.018
+    unmet_need: 0.082
+    total_fertility_rate: 1.7
+
+  # ─── CHW ECOSYSTEM (Karnataka specific estimates) ─────────────────────────
+  chw_ecosystem:
+    asha_coverage_rural: 0.94              # % villages with ASHA
+    anm_sub_center_ratio: 1.0             # 1 ANM per sub-center
+    avg_households_per_asha: 147
+    avg_records_per_patient_sources:
+      min: 1
+      max: 6
+      mean: 2.8
+    data_entry_delay_days:               # Lag between event and digital entry
+      asha: {mean: 4.2, std: 3.1}
+      anm: {mean: 1.8, std: 1.4}
+      aww: {mean: 6.1, std: 4.8}
+      phc: {mean: 0.3, std: 0.5}
+    # Source-level data quality (used in resolution confidence)
+    source_reliability:
+      phc_doctor: 0.95
+      anm: 0.88
+      asha: 0.74
+      aww: 0.71
+      district_hospital: 0.97
+      chc: 0.93
+
+  # ─── DISTRICTS (for geographic sampling) ─────────────────────────────────
+  karnataka_districts:
+    high_burden:
+      - Kalaburagi
+      - Yadgir
+      - Raichur
+      - Koppal
+      - Ballari
+    medium_burden:
+      - Vijayapura
+      - Bidar
+      - Haveri
+      - Gadag
+      - Chitradurga
+    low_burden:
+      - Dakshina Kannada
+      - Udupi
+      - Kodagu
+      - Bengaluru Rural
+      - Tumkur
+    district_anaemia_adjustments:
+      Kalaburagi: +0.08
+      Yadgir: +0.11
+      Raichur: +0.09
+      Dakshina_Kannada: -0.06
+      Udupi: -0.07
+
+  # ─── CONFLICT INJECTION PARAMETERS ──────────────────────────────────────
+  conflict_simulation:
+    overall_conflict_rate: 0.231
+    conflict_type_distribution:
+      numeric_outlier: 0.28
+      categorical_mismatch: 0.22
+      temporal_inconsistency: 0.19
+      demographic_drift: 0.14
+      physiological_impossibility: 0.09
+      cross_field_contradiction: 0.08
+    field_conflict_rates:
+      hemoglobin: 0.31
+      weight: 0.27
+      blood_pressure: 0.24
+      immunization_status: 0.22
+      age: 0.11
+      pregnancy_status: 0.18
+      visit_date: 0.33

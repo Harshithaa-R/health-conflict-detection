@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-05-03T10:23:23.791762",
+  "n_patients": 2000,
+  "total_records": 8004,
+  "conflicted_records": 878,
+  "conflict_rate": 0.1097,
+  "seed": 42,
+  "source_distribution": {
+    "district_hospital": 1360,
+    "aww": 1352,
+    "phc_doctor": 1348,
+    "anm": 1331,
+    "asha": 1325,
+    "chc": 1288
+  },
+  "conflict_type_distribution": {
+    "numeric_outlier": 233,
+    "categorical_mismatch": 209,
+    "temporal_inconsistency": 164,
+    "demographic_drift": 126,
+    "physiological_impossibility": 77,
+    "cross_field_contradiction": 69
+  },
+  "district_distribution": {
+    "Bidar": 658,
+    "Kalaburagi": 636,
+    "Vijayapura": 634,
+    "Haveri": 626,
+    "Chitradurga": 612,
+    "Gadag": 597,
+    "Koppal": 586,
+    "Raichur": 585,
+    "Ballari": 547,
+    "Yadgir": 524,
+    "Tumkur": 484,
+    "Kodagu": 439,
+    "Udupi": 399,
+    "Bengaluru Rural": 360,
+    "Dakshina Kannada": 317
+  },
+  "nfhs5_reference": "Karnataka State Fact Sheet, NFHS-5 (2019-21)"
+}

@@ -1,0 +1,77 @@
+# configs/pipeline.yaml
+# Main pipeline configuration for conflict detection system
+
+pipeline:
+  name: "karnataka-chw-conflict-detection"
+  version: "1.0.0"
+
+data:
+  raw_dir: "data/raw/"
+  processed_dir: "data/processed/"
+  synthetic_dir: "data/synthetic/"
+  nfhs5_ref: "data/nfhs5_reference/karnataka_distributions.yaml"
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+
+preprocessing:
+  entity_resolution:
+    method: "minhash_lsh"
+    num_perm: 128
+    threshold: 0.75
+    blocking_keys: ["district", "age_band"]
+  normalization:
+    hemoglobin: {mean: 11.8, std: 2.1}
+    sbp:        {mean: 115.0, std: 16.0}
+    dbp:        {mean: 75.0, std: 10.0}
+    weight_kg:  {mean: 52.4, std: 10.2}
+    height_cm:  {mean: 153.4, std: 6.2}
+  date_format: "%Y-%m-%d"
+
+conflict_detection:
+  model: "xgboost_hybrid"        # xgboost_hybrid | lightgbm | rule_only
+  rule_engine: true
+  confidence_threshold: 0.65
+  source_reliability_weighting: true
+  feature_cols:
+    - age_recorded
+    - height_cm
+    - weight_kg
+    - bmi
+    - hemoglobin
+    - sbp
+    - dbp
+    - fasting_glucose
+    - anc_visits
+    - source_reliability
+    - bmi_calc_delta
+    - hb_z_score
+    - sbp_z_score
+    - pulse_pressure
+
+resolution:
+  strategy: "weighted"           # weighted | most_reliable | most_recent | median
+  recency_half_life_days: 90
+  manual_review_threshold: 2    # flag for review if >= N fields have high disagreement
+
+evaluation:
+  metrics:
+    - accuracy
+    - f1_macro
+    - precision
+    - recall
+    - roc_auc
+  conflict_type_breakdown: true
+  per_district_analysis: true
+  per_source_analysis: true
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  log_level: "info"
+
+logging:
+  level: "INFO"
+  output_dir: "logs/"
+  format: "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
