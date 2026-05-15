@@ -1,0 +1,22 @@
+{
+  "age": {
+    "baseline_mae": 0.0467,
+    "baseline_rmse": 0.1666,
+    "records_evaluated": 9768
+  },
+  "weight": {
+    "baseline_mae": 0.0037,
+    "baseline_rmse": 0.0858,
+    "records_evaluated": 7000
+  },
+  "bp_systolic": {
+    "baseline_mae": 0.005,
+    "baseline_rmse": 0.2988,
+    "records_evaluated": 7000
+  },
+  "hemoglobin": {
+    "baseline_mae": 0.02,
+    "baseline_rmse": 0.1335,
+    "records_evaluated": 7000
+  }
+}

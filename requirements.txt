@@ -1,35 +1,7 @@
-# Core ML
-numpy>=1.26.0
-pandas>=2.1.0
-scikit-learn>=1.4.0
-xgboost>=2.0.0
-lightgbm>=4.1.0
-joblib>=1.3.0
-
-# Data generation
-scipy>=1.11.0
-faker>=20.0.0
-pyyaml>=6.0
-
-# Entity resolution / similarity
-faiss-cpu>=1.7.4
-datasketch>=1.6.4    # MinHash LSH
-
-# API
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-pydantic>=2.5.0
-
-# Dashboard
-streamlit>=1.29.0
-plotly>=5.18.0
-
-# Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
-
-# Utilities
-tqdm>=4.66.0
-python-dotenv>=1.0.0
-loguru>=0.7.0
-hydra-core>=1.3.0
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.3.0
+scipy==1.11.0
+matplotlib==3.7.2
+faker==19.0.0
+jupyter==1.0.0
