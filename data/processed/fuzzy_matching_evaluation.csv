@@ -1,0 +1,7 @@
+cadre_pair,avg_score,min_score,max_score,precision,recall,f1,true_positives,false_negatives
+ASHA vs ANM,93.65,78.67,100.0,1.0,0.836,0.911,418,82
+ASHA vs PHC,91.82,67.19,100.0,1.0,0.724,0.84,362,138
+ASHA vs Anganwadi,77.03,61.57,88.1,1.0,0.076,0.141,38,462
+ANM vs PHC,89.01,70.45,100.0,1.0,0.636,0.778,318,182
+ANM vs Anganwadi,77.68,60.37,88.1,1.0,0.102,0.185,51,449
+PHC vs Anganwadi,75.41,57.33,88.1,1.0,0.052,0.099,26,474

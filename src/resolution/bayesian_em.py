@@ -1,196 +1,200 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-import json
 import os
 
-np.random.seed(42)
+FIELDS = [
+    "haemoglobin_gdl",
+    "systolic_bp",
+    "blood_sugar_fasting",
+    "weight_kg",
+    "fundal_height_cm",
+    "anc_visits_count"
+]
 
 
-def inject_age_conflicts(df):
-    df = df.copy()
-
-    if 'dob' not in df.columns or 'cadre' not in df.columns:
-        return df
-
-    df['dob'] = pd.to_datetime(df['dob'], errors='coerce')
-
-    current_year = pd.Timestamp.now().year
-
-    df['base_age'] = current_year - df['dob'].dt.year
-
-    def modify_age(row):
-        age = row['base_age']
-
-        if pd.isna(age):
-            return np.nan
-
-        cadre = str(row['cadre']).strip()
-
-        if cadre == 'ASHA':
-            if np.random.rand() < 0.30:
-                return max(0, age + np.random.choice([-1, 1]))
-
-        elif cadre == 'ANM':
-            if np.random.rand() < 0.05:
-                return max(0, age + np.random.choice([-1, 1]))
-
-        elif cadre == 'PHC':
-            if np.random.rand() < 0.15:
-                return max(0, age + np.random.choice([-2, -1, 1, 2]))
-
-        elif cadre == 'Anganwadi':
-            if np.random.rand() < 0.25:
-                return max(0, age - 1)
-
-        return age
-
-    df['age'] = df.apply(modify_age, axis=1)
-
-    df.drop(columns=['base_age'], inplace=True)
-
-    return df
+MAX_ITERATIONS = 20
+CONVERGENCE_THRESHOLD = 0.0001
 
 
-def evaluate_conflict_resolution():
+def run_em(group, field):
 
-    linked_path = 'data/processed/linked_records.csv'
-    truth_path = 'data/synthetic/ground_truth.csv'
+    data = group[
+        ["cadre", field]
+    ].dropna()
 
-    if not os.path.exists(linked_path):
-        print(f"❌ File not found: {linked_path}")
-        return
+    if len(data) == 0:
+        return np.nan
 
-    if not os.path.exists(truth_path):
-        print(f"❌ File not found: {truth_path}")
-        return
+    # ---------------------------------------
+    # INITIAL SOURCE RELIABILITY
+    # ---------------------------------------
 
-    linked_df = pd.read_csv(linked_path, low_memory=False)
-    ground_truth_df = pd.read_csv(truth_path, low_memory=False)
-
-    if linked_df.empty:
-        print("❌ linked_records.csv is empty")
-        return
-
-    if ground_truth_df.empty:
-        print("❌ ground_truth.csv is empty")
-        return
-
-    linked_df = inject_age_conflicts(linked_df)
-
-    if 'dob' in linked_df.columns:
-        linked_df['dob'] = pd.to_datetime(
-            linked_df['dob'],
-            errors='coerce'
-        )
-
-        current_year = pd.Timestamp.now().year
-
-        linked_df['true_age'] = (
-            current_year - linked_df['dob'].dt.year
-        )
-
-    if 'patient_id' not in linked_df.columns:
-        print("❌ patient_id missing in linked_records.csv")
-        return
-
-    if 'patient_id' not in ground_truth_df.columns:
-        print("❌ patient_id missing in ground_truth.csv")
-        return
-
-    eval_df = linked_df.merge(
-        ground_truth_df,
-        on='patient_id',
-        how='inner'
-    )
-
-    if eval_df.empty:
-        print("❌ No matching patient IDs found")
-        return
-
-    fields_map = {
-        'age': ('age', 'true_age'),
-        'weight': ('weight_kg', 'true_weight_kg'),
-        'bp_systolic': ('systolic_bp', 'true_systolic_bp'),
-        'hemoglobin': ('haemoglobin_gdl', 'true_haemoglobin_gdl')
+    reliabilities = {
+        source: 0.8
+        for source in data["cadre"].unique()
     }
 
-    results = {}
+    truth = data[field].mean()
 
-    for field, (source_field, true_field) in fields_map.items():
+    # ---------------------------------------
+    # EM ITERATIONS
+    # ---------------------------------------
 
-        print(f"\n{'=' * 60}")
-        print(f"EVALUATING: {field.upper()}")
-        print(f"{'=' * 60}")
+    for _ in range(MAX_ITERATIONS):
 
-        if source_field not in eval_df.columns:
-            print(f"⚠️ Missing column: {source_field}")
-            continue
+        old_truth = truth
 
-        if true_field not in eval_df.columns:
-            print(f"⚠️ Missing column: {true_field}")
-            continue
+        # ==============================
+        # E STEP
+        # ==============================
 
-        baseline_vals = []
-        true_vals = []
+        numerator = 0
+        denominator = 0
 
-        grouped = eval_df.groupby('patient_id')
+        for _, row in data.iterrows():
 
-        for _, group in grouped:
+            source = row["cadre"]
+            value = row[field]
 
-            source_vals = pd.to_numeric(
-                group[source_field],
-                errors='coerce'
-            ).dropna()
+            weight = reliabilities[source]
 
-            if len(source_vals) == 0:
-                continue
+            numerator += value * weight
+            denominator += weight
 
-            true_val = pd.to_numeric(
-                pd.Series([group[true_field].iloc[0]]),
-                errors='coerce'
-            ).iloc[0]
+        truth = numerator / denominator
 
-            if pd.isna(true_val):
-                continue
+        # ==============================
+        # M STEP
+        # ==============================
 
-            baseline_vals.append(float(np.median(source_vals)))
-            true_vals.append(float(true_val))
+        for source in reliabilities:
 
-        if len(true_vals) == 0:
-            print("⚠️ No valid records found")
-            continue
+            source_rows = data[
+                data["cadre"] == source
+            ]
 
-        baseline_mae = mean_absolute_error(
-            true_vals,
-            baseline_vals
-        )
+            errors = []
 
-        baseline_rmse = np.sqrt(
-            mean_squared_error(
-                true_vals,
-                baseline_vals
+            for _, row in source_rows.iterrows():
+
+                error = abs(
+                    row[field] - truth
+                )
+
+                errors.append(error)
+
+            mean_error = np.mean(errors)
+
+            reliability = (
+                1 /
+                (1 + mean_error)
             )
-        )
 
-        print("\nBaseline:")
-        print(f"  MAE:  {baseline_mae:.4f}")
-        print(f"  RMSE: {baseline_rmse:.4f}")
-        print(f"  Records evaluated: {len(baseline_vals)}")
+            reliabilities[source] = reliability
 
-        results[field] = {
-            'baseline_mae': round(float(baseline_mae), 4),
-            'baseline_rmse': round(float(baseline_rmse), 4),
-            'records_evaluated': int(len(baseline_vals))
+        # ==============================
+        # CONVERGENCE
+        # ==============================
+
+        if abs(truth - old_truth) < CONVERGENCE_THRESHOLD:
+            break
+
+    return round(truth, 2)
+
+
+def resolve_conflicts():
+
+    print(
+        "Loading reliability scored records..."
+    )
+
+    df = pd.read_csv(
+        "data/processed/reliability_scored_records.csv"
+    )
+
+    grouped = df.groupby(
+        "patient_id"
+    )
+
+    resolved_records = []
+
+    for patient_id, group in grouped:
+
+        resolved = {
+
+            "patient_id":
+                patient_id,
+
+            "district":
+                group.iloc[0]["district"],
+
+            "village":
+                group.iloc[0]["village"],
+
+            "true_high_risk":
+                group.iloc[0]["true_high_risk"],
+
+            "true_high_risk_reason":
+                group.iloc[0]["true_high_risk_reason"]
         }
 
-    os.makedirs('results', exist_ok=True)
+        for field in FIELDS:
 
-    with open('results/evaluation.json', 'w') as f:
-        json.dump(results, f, indent=2)
+            resolved[field] = run_em(
+                group,
+                field
+            )
 
-    print("\n✓ Results saved to results/evaluation.json")
+        resolved["sources_used"] = len(group)
+
+        resolved_records.append(
+            resolved
+        )
+
+    resolved_df = pd.DataFrame(
+        resolved_records
+    )
+
+    os.makedirs(
+        "data/processed",
+        exist_ok=True
+    )
+
+    resolved_df.to_csv(
+        "data/processed/resolved_maternal_records.csv",
+        index=False
+    )
+
+    print("\nBayesian EM Summary")
+    print("=" * 50)
+
+    print(
+        f"Resolved Patients : "
+        f"{len(resolved_df):,}"
+    )
+
+    print(
+        f"Average Hb : "
+        f"{round(resolved_df['haemoglobin_gdl'].mean(), 2)}"
+    )
+
+    print(
+        f"Average BP : "
+        f"{round(resolved_df['systolic_bp'].mean(), 2)}"
+    )
+
+    print(
+        f"Average Glucose : "
+        f"{round(resolved_df['blood_sugar_fasting'].mean(), 2)}"
+    )
+
+    print(
+        "\nSaved:"
+        " data/processed/resolved_maternal_records.csv"
+    )
+
+    return resolved_df
 
 
 if __name__ == "__main__":
-    evaluate_conflict_resolution()
+    resolve_conflicts()
