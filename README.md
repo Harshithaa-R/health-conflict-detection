@@ -145,7 +145,10 @@ streamlit run dashboard/app.py
 
 ## Contributors
 
-- [Your Name] — Lead Developer
+- [Tanvi Pushparaj]
+- [Harshithaa R]
+- [Gajula Rushika]
+- [Sonika Sugarkar]
 
 ## License
 
