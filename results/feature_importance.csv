@@ -1,13 +1,43 @@
-feature,importance
-haemoglobin_gdl,0.3305959138602054
-severe_anaemia,0.21738116410430222
-systolic_bp,0.15104121349266592
-hypertension_risk,0.09586452315884854
-blood_sugar_fasting,0.07969602874868026
-diabetes_risk,0.04590726800699189
-anc_visits_count,0.02990560587964788
-weight_kg,0.017203576871293175
-fundal_height_cm,0.01676634098414241
-poor_anc_coverage,0.013890977116332954
-fundal_height_risk,0.00098584416520655
-low_weight_risk,0.0007615436116829221
+feature,importance,model,domain
+weight_kg,0.40322144405585447,Random Forest,maternal
+haemoglobin_gdl,0.34544584952046076,Random Forest,maternal
+systolic_bp,0.1319910266459042,Random Forest,maternal
+blood_sugar_fasting,0.06951649554716281,Random Forest,maternal
+anc_visits_count,0.03288948574999517,Random Forest,maternal
+fundal_height_cm,0.0169356984806224,Random Forest,maternal
+haemoglobin_gdl,0.34309327602386475,XGBoost,maternal
+weight_kg,0.3011378347873688,XGBoost,maternal
+systolic_bp,0.1804734319448471,XGBoost,maternal
+blood_sugar_fasting,0.07549620419740677,XGBoost,maternal
+anc_visits_count,0.06976072490215302,XGBoost,maternal
+fundal_height_cm,0.030038485303521156,XGBoost,maternal
+haz_score,0.4691212596941207,Random Forest,child
+waz_score,0.3154714427672263,Random Forest,child
+muac_cm,0.08082932103006413,Random Forest,child
+haemoglobin_child,0.07540678099113894,Random Forest,child
+weight_child_kg,0.027601090817107696,Random Forest,child
+height_cm,0.025192859283079523,Random Forest,child
+immunization_score,0.006377245417262754,Random Forest,child
+haz_score,0.3100060820579529,XGBoost,child
+waz_score,0.2807254195213318,XGBoost,child
+haemoglobin_child,0.1150040253996849,XGBoost,child
+muac_cm,0.10627634823322296,XGBoost,child
+weight_child_kg,0.06529531627893448,XGBoost,child
+height_cm,0.06337437778711319,XGBoost,child
+immunization_score,0.05931856855750084,XGBoost,child
+bp_systolic_reading1,0.2820680105737296,Random Forest,chronic
+hba1c,0.2669515140335308,Random Forest,chronic
+missed_doses_count,0.15314277774776247,Random Forest,chronic
+bp_diastolic_reading1,0.11681205063320747,Random Forest,chronic
+fasting_blood_sugar,0.07295472225106392,Random Forest,chronic
+postprandial_blood_sugar,0.0644724694309349,Random Forest,chronic
+creatinine,0.022362355081976523,Random Forest,chronic
+bmi,0.021236100247794397,Random Forest,chronic
+hba1c,0.43525320291519165,XGBoost,chronic
+bp_systolic_reading1,0.18834488093852997,XGBoost,chronic
+fasting_blood_sugar,0.13079509139060974,XGBoost,chronic
+missed_doses_count,0.11067340523004532,XGBoost,chronic
+bp_diastolic_reading1,0.056444328278303146,XGBoost,chronic
+postprandial_blood_sugar,0.044774990528821945,XGBoost,chronic
+bmi,0.01698322594165802,XGBoost,chronic
+creatinine,0.016730869188904762,XGBoost,chronic

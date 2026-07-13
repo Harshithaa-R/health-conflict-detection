@@ -7,8 +7,13 @@ def create_blocks():
     print("Loading standardized records...")
 
     df = pd.read_csv(
-        "data/processed/standardized_records.csv"
+        "data/processed/standardized_records.csv",
+        low_memory=False
     )
+
+    # Ensure domain column exists
+    if "domain" not in df.columns:
+        df["domain"] = "maternal"
 
     df["name_prefix"] = (
         df["name"]
@@ -21,16 +26,20 @@ def create_blocks():
 
     blocks = []
 
+    # ---------------------------------------------------
+    # GROUP BY domain + district + name_prefix
+    # Domain ensures children are never blocked
+    # with maternal or chronic patients
+    # ---------------------------------------------------
+
     grouped = df.groupby(
-        ["district", "name_prefix"]
+        ["domain", "district", "name_prefix"]
     )
 
     for block_id, (_, group) in enumerate(grouped):
 
         temp = group.copy()
-
         temp["block_id"] = block_id
-
         blocks.append(temp)
 
     blocked_df = pd.concat(
@@ -38,10 +47,7 @@ def create_blocks():
         ignore_index=True
     )
 
-    os.makedirs(
-        "data/processed",
-        exist_ok=True
-    )
+    os.makedirs("data/processed", exist_ok=True)
 
     blocked_df.to_csv(
         "data/processed/blocked_records.csv",
@@ -50,25 +56,19 @@ def create_blocks():
 
     print("\nBlocking Complete")
     print("=" * 50)
-
+    print(f"Total Records  : {len(blocked_df):,}")
+    print(f"Unique Blocks  : {blocked_df['block_id'].nunique():,}")
     print(
-        f"Total Records : {len(blocked_df):,}"
-    )
-
-    print(
-        f"Unique Blocks : "
-        f"{blocked_df['block_id'].nunique():,}"
-    )
-
-    print(
-        "\nAverage Records Per Block : "
+        f"Avg Records/Block : "
         f"{round(blocked_df.groupby('block_id').size().mean(), 2)}"
     )
 
-    print(
-        "\nSaved: "
-        "data/processed/blocked_records.csv"
-    )
+    if "domain" in blocked_df.columns:
+        print("\nBlocks by Domain:")
+        domain_blocks = blocked_df.groupby("domain")["block_id"].nunique()
+        print(domain_blocks.to_string())
+
+    print("\nSaved: data/processed/blocked_records.csv")
 
     return blocked_df
 

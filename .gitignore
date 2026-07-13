@@ -24,3 +24,11 @@ wheels/
 .DS_Store
 .env
 venv/
+node_modules/
+**/node_modules/
+.cache/
+**/.cache/
+firebase-debug.log
+*.log
+__pycache__/
+*.pyc

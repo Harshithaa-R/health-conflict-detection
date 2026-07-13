@@ -37,27 +37,21 @@ def get_patient_conflict(patient_id):
     for _, row in source_rows.iterrows():
 
         sources.append({
+    "cadre": row["cadre"],
 
-            "cadre":
-                row["cadre"],
+    "haemoglobin": float(row["haemoglobin_gdl"]),
+    "blood_pressure": float(row["systolic_bp"]),
+    "blood_sugar": float(row["blood_sugar_fasting"]),
 
-            "haemoglobin":
-                float(row["haemoglobin_gdl"]),
+    "anc_visits": int(row["anc_visits_count"]),
+    "weight": float(row["weight_kg"]),
+    "fundal_height": float(row["fundal_height_cm"]),
 
-            "blood_pressure":
-                float(row["systolic_bp"]),
-
-            "blood_sugar":
-                float(row["blood_sugar_fasting"]),
-
-            "reliability":
-                round(
-                    float(
-                        row["source_reliability"]
-                    ),
-                    3
-                )
-        })
+    "reliability": round(
+        float(row["source_reliability"]),
+        3
+    )
+})
 
     return {
 
@@ -78,27 +72,24 @@ def get_patient_conflict(patient_id):
 
         "resolved_values": {
 
-            "haemoglobin":
-                float(
-                    resolved_row[
-                        "haemoglobin_gdl"
-                    ]
-                ),
+    "haemoglobin":
+        float(resolved_row["haemoglobin_gdl"]),
 
-            "blood_pressure":
-                float(
-                    resolved_row[
-                        "systolic_bp"
-                    ]
-                ),
+    "blood_pressure":
+        float(resolved_row["systolic_bp"]),
 
-            "blood_sugar":
-                float(
-                    resolved_row[
-                        "blood_sugar_fasting"
-                    ]
-                )
-        },
+    "blood_sugar":
+        float(resolved_row["blood_sugar_fasting"]),
+
+    "anc_visits":
+        int(resolved_row["anc_visits_count"]),
+
+    "weight":
+        float(resolved_row["weight_kg"]),
+
+    "fundal_height":
+        float(resolved_row["fundal_height_cm"])
+},
 
         "predicted_high_risk":
             int(
