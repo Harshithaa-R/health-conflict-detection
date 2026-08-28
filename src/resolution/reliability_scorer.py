@@ -1,26 +1,49 @@
 import pandas as pd
-import numpy as np
 import os
 
 
-# ---------------------------------------------------
-# BASE SOURCE RELIABILITY
-# Same cadre hierarchy applies across all domains —
-# PHC has lab access, ASHA has community-level accuracy
-# ---------------------------------------------------
+# ===================================================
+# RELIABILITY CONFIGURATION
+# ===================================================
 
 BASE_RELIABILITY = {
-    "PHC":       0.95,
-    "ANM":       0.90,
+    "PHC": 0.95,
+    "ANM": 0.90,
     "ANGANWADI": 0.75,
-    "ASHA":      0.70,
+    "ASHA": 0.70,
 }
 
+# Penalty applied for each missing important field
+MISSING_FIELD_PENALTY = 0.05
 
-# ---------------------------------------------------
+# Cadre-specific adjustments
+CADRE_ADJUSTMENTS = {
+    "ASHA": -0.05,
+    "PHC": 0.02,
+}
+
+# Domain-specific adjustments
+DOMAIN_ADJUSTMENTS = {
+    "maternal": {
+        "ANC_COMPLETENESS": 0.03,
+    },
+    "child": {
+        "ANGANWADI_CHILD": 0.03,
+    },
+    "chronic": {
+        "PHC_LAB": 0.02,
+        "ASHA_CHRONIC": -0.03,
+    },
+}
+
+# Reliability score limits
+MIN_RELIABILITY = 0.10
+MAX_RELIABILITY = 0.99
+
+
+# ===================================================
 # IMPORTANT FIELDS PER DOMAIN
-# Missing values in these fields penalise reliability
-# ---------------------------------------------------
+# ===================================================
 
 IMPORTANT_FIELDS = {
 
@@ -48,142 +71,263 @@ IMPORTANT_FIELDS = {
 }
 
 
+# ===================================================
+# RELIABILITY CALCULATION
+# ===================================================
+
 def calculate_record_reliability(row):
 
-    cadre  = str(row.get("cadre", "ASHA")).upper()
-    domain = str(row.get("domain", "maternal")).lower()
+    cadre = str(
+        row.get("cadre", "ASHA")
+    ).upper()
 
-    score = BASE_RELIABILITY.get(cadre, 0.5)
+    domain = str(
+        row.get("domain", "maternal")
+    ).lower()
 
     # ---------------------------------------------------
-    # MISSING VALUE PENALTY
-    # -0.05 per missing important field for this domain
+    # Base reliability
     # ---------------------------------------------------
 
-    fields = IMPORTANT_FIELDS.get(domain, IMPORTANT_FIELDS["maternal"])
-
-    missing_count = sum(
-        1 for f in fields
-        if f in row.index and pd.isna(row[f])
+    score = BASE_RELIABILITY.get(
+        cadre,
+        0.50
     )
 
-    score -= missing_count * 0.05
-
     # ---------------------------------------------------
-    # CADRE-LEVEL VARIANCE ADJUSTMENTS
+    # Missing important fields
     # ---------------------------------------------------
 
-    if cadre == "ASHA":
-        score -= 0.05   # higher noise in community recordings
+    fields = IMPORTANT_FIELDS.get(
+        domain,
+        IMPORTANT_FIELDS["maternal"]
+    )
 
-    if cadre == "PHC":
-        score += 0.02   # lab-verified, most accurate
+    missing_count = sum(
+        1
+        for field in fields
+        if field in row.index
+        and pd.isna(row[field])
+    )
+
+    score -= (
+        missing_count
+        * MISSING_FIELD_PENALTY
+    )
 
     # ---------------------------------------------------
-    # DOMAIN-SPECIFIC BONUSES
+    # Cadre adjustment
+    # ---------------------------------------------------
+
+    score += CADRE_ADJUSTMENTS.get(
+        cadre,
+        0.0
+    )
+
+    # ---------------------------------------------------
+    # Domain-specific adjustments
     # ---------------------------------------------------
 
     if domain == "maternal":
-        # ANC completeness bonus
-        anc = row.get("anc_visits_count", None)
-        if pd.notna(anc) and anc >= 4:
-            score += 0.03
+
+        anc = row.get(
+            "anc_visits_count",
+            None
+        )
+
+        if (
+            pd.notna(anc)
+            and anc >= 4
+        ):
+            score += DOMAIN_ADJUSTMENTS[
+                "maternal"
+            ]["ANC_COMPLETENESS"]
 
     elif domain == "child":
-        # Anganwadi is strong for under-6 nutrition data
+
         if cadre == "ANGANWADI":
-            age_months = row.get("child_age_months", 999)
-            if pd.notna(age_months) and age_months <= 72:
-                score += 0.03
+
+            age_months = row.get(
+                "child_age_months",
+                999
+            )
+
+            if (
+                pd.notna(age_months)
+                and age_months <= 72
+            ):
+                score += DOMAIN_ADJUSTMENTS[
+                    "child"
+                ]["ANGANWADI_CHILD"]
 
     elif domain == "chronic":
-        # PHC bonus for lab fields (HbA1c, creatinine, GeneXpert)
+
         if cadre == "PHC":
-            score += 0.02
+            score += DOMAIN_ADJUSTMENTS[
+                "chronic"
+            ]["PHC_LAB"]
 
-        # ASHA stronger penalty for chronic — mostly adherence tracking
         if cadre == "ASHA":
-            score -= 0.03
+            score += DOMAIN_ADJUSTMENTS[
+                "chronic"
+            ]["ASHA_CHRONIC"]
 
     # ---------------------------------------------------
-    # NORMALISE
+    # Clip reliability to configured range
     # ---------------------------------------------------
 
-    score = max(0.10, min(0.99, score))
+    score = max(
+        MIN_RELIABILITY,
+        min(
+            MAX_RELIABILITY,
+            score
+        )
+    )
 
-    return round(score, 3)
+    return round(
+        score,
+        3
+    )
 
+
+# ===================================================
+# GENERATE RELIABILITY SCORES
+# ===================================================
 
 def generate_reliability_scores():
 
-    print("Loading standardized records...")
+    print(
+        "Loading standardized records..."
+    )
 
-    # Prefer standardized (processed) over raw synthetic
-    std_path = "data/processed/standardized_records.csv"
-    raw_path = "data/synthetic/unified_health_records.csv"
-    mat_path = "data/synthetic/maternal_records.csv"
+    std_path = (
+        "data/processed/"
+        "standardized_records.csv"
+    )
+
+    raw_path = (
+        "data/synthetic/"
+        "unified_health_records.csv"
+    )
+
+    mat_path = (
+        "data/synthetic/"
+        "maternal_records.csv"
+    )
 
     if os.path.exists(std_path):
-        df = pd.read_csv(std_path, low_memory=False)
+
+        df = pd.read_csv(
+            std_path,
+            low_memory=False
+        )
+
     elif os.path.exists(raw_path):
-        df = pd.read_csv(raw_path, low_memory=False)
+
+        df = pd.read_csv(
+            raw_path,
+            low_memory=False
+        )
+
     else:
-        print("Falling back to maternal_records.csv...")
-        df = pd.read_csv(mat_path, low_memory=False)
+
+        print(
+            "Falling back to "
+            "maternal_records.csv..."
+        )
+
+        df = pd.read_csv(
+            mat_path,
+            low_memory=False
+        )
 
     if "domain" not in df.columns:
         df["domain"] = "maternal"
 
     if "cadre" in df.columns:
-        df["cadre"] = df["cadre"].astype(str).str.upper().str.strip()
+
+        df["cadre"] = (
+            df["cadre"]
+            .astype(str)
+            .str.upper()
+            .str.strip()
+        )
 
     df["source_reliability"] = df.apply(
         calculate_record_reliability,
         axis=1
     )
 
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs(
+        "data/processed",
+        exist_ok=True
+    )
+
+    output_path = (
+        "data/processed/"
+        "reliability_scored_records.csv"
+    )
 
     df.to_csv(
-        "data/processed/reliability_scored_records.csv",
+        output_path,
         index=False
     )
 
     # ---------------------------------------------------
-    # SUMMARY
+    # Summary
     # ---------------------------------------------------
 
-    print("\nReliability Summary")
+    print(
+        "\nReliability Summary"
+    )
     print("=" * 50)
 
-    print("\nBy Cadre (all domains):")
     print(
-        df.groupby("cadre")["source_reliability"]
+        "\nBy Cadre (all domains):"
+    )
+
+    print(
+        df.groupby("cadre")[
+            "source_reliability"
+        ]
         .mean()
         .round(4)
         .to_string()
     )
 
-    if "domain" in df.columns:
-        print("\nBy Domain + Cadre:")
-        summary = (
-            df.groupby(["domain", "cadre"])["source_reliability"]
-            .mean()
-            .round(4)
-        )
-        print(summary.to_string())
-
     print(
-        f"\nOverall Average : "
-        f"{round(df['source_reliability'].mean(), 4)}"
+        "\nBy Domain + Cadre:"
+    )
+
+    summary = (
+        df.groupby(
+            ["domain", "cadre"]
+        )[
+            "source_reliability"
+        ]
+        .mean()
+        .round(4)
     )
 
     print(
-        "\nSaved: data/processed/reliability_scored_records.csv"
+        summary.to_string()
+    )
+
+    print(
+        f"\nOverall Average : "
+        f"{df['source_reliability'].mean():.4f}"
+    )
+
+    print(
+        f"\nSaved: {output_path}"
     )
 
     return df
 
+
+# ===================================================
+# MAIN
+# ===================================================
 
 if __name__ == "__main__":
 
