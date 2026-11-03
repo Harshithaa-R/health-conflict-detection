@@ -1,89 +1,29 @@
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 220 33% 97%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 224 37% 35%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 195 70% 50%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 195 70% 50%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 224 37% 35%;
-    --radius: 0.75rem;
-    --chart-1: 224 37% 35%;
-    --chart-2: 195 70% 50%;
-    --chart-3: 160 60% 45%;
-    --chart-4: 35 90% 65%;
-    --chart-5: 0 84% 60%;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 224 37% 35%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 195 70% 50%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 222 47% 12%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 222 47% 12%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 15%;
-    --input: 222 47% 15%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 224 37% 45%;
-    --chart-2: 195 70% 60%;
-    --chart-3: 160 60% 55%;
-    --chart-4: 35 90% 75%;
-    --chart-5: 0 84% 70%;
-    --sidebar-background: 222 47% 4%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224 37% 35%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground font-body;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline tracking-tight;
-  }
-}
+:root { color-scheme: dark; --background:#090d14; --panel:#0f1623; --border:rgba(255,255,255,.08); --muted:#758196; --blue:#3b82f6; }
+* { box-sizing:border-box; }
+html,body { margin:0; min-height:100%; background:var(--background); color:#f8fafc; font-family:Arial,Helvetica,sans-serif; }
+button,input,select,textarea { font:inherit; }
+button { cursor:pointer; }
+.app-shell { min-height:100vh; display:flex; background:var(--background); }
+.sidebar { width:265px; position:fixed; inset:0 auto 0 0; background:#0c1119; border-right:1px solid var(--border); padding:22px 16px; display:flex; flex-direction:column; z-index:2; }
+.brand { display:flex; align-items:center; gap:12px; padding:2px 6px 26px; border-bottom:1px solid var(--border); }
+.brand-mark { display:grid; place-items:center; width:46px; height:46px; border-radius:14px; background:#2563eb; color:white; font-size:23px; font-weight:800; }
+.brand b { display:block; font-size:17px; }.brand small,.side-bottom small { display:block; margin-top:4px; color:#526078; font-size:10px; letter-spacing:2px; }
+.eyebrow { color:#526078; font-size:10px; letter-spacing:2px; font-weight:700; margin:26px 8px 12px; }
+.nav-item { display:flex; justify-content:space-between; color:#8290a5; text-decoration:none; padding:13px 12px; border-radius:9px; margin:3px 0; }.nav-item:hover,.nav-item.active { background:#14223a; color:#60a5fa; }
+.nav-item span { background:#ef4444; color:white; border-radius:20px; padding:2px 8px; font-size:11px; }
+.side-bottom { margin-top:auto; border-top:1px solid var(--border); padding:18px 8px 4px; }.side-bottom small { letter-spacing:1px; }.side-bottom .secondary-button { margin-top:14px; width:100%; }
+.workspace { margin-left:265px; width:calc(100% - 265px); min-height:100vh; }
+.topbar { height:76px; display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:1px solid var(--border); padding:0 28px; position:sticky; top:0; background:rgba(9,13,20,.96); z-index:1; }.topbar h1 { font-size:21px; margin:0; }.user-chip { margin-left:auto; color:#9aa7ba; font-size:13px; }
+.content { padding:28px; max-width:1600px; margin:auto; }.metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-bottom:16px; }.metrics.two { grid-template-columns:repeat(2,minmax(0,1fr)); margin-bottom:28px; }
+.metric { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:24px; min-height:142px; }.metric .eyebrow { margin:0 0 16px; }.metric strong { display:block; font-size:34px; line-height:1.15; }.metric p,.muted { color:var(--muted); font-size:13px; margin:8px 0 0; }
+.columns { display:grid; grid-template-columns:minmax(0,2fr) minmax(270px,.9fr); gap:22px; align-items:start; }.section-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }.section-title h2,.reliability h2 { font-size:18px; margin:0; }.section-title p { color:var(--muted); font-size:12px; margin:6px 0 0; }
+.filters { display:flex; gap:10px; margin-bottom:12px; }.filters input,.filters select,.stack input,.stack select,.stack textarea { background:#111927; color:#e5e7eb; border:1px solid var(--border); padding:11px 12px; border-radius:8px; outline:none; min-width:0; }.filters input:first-child { flex:2; }.filters input,.filters select { flex:1; }.filters input:focus,.stack input:focus,.stack textarea:focus { border-color:#3b82f6; }
+.queue-list { display:flex; flex-direction:column; gap:10px; }.queue-row { display:flex; justify-content:space-between; gap:16px; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; }.patient-id { color:#758196; font-size:12px; margin-right:10px; }.queue-row h3 { margin:9px 0 4px; font-size:16px; }.queue-row p { margin:5px 0; color:var(--muted); font-size:12px; }.row-actions { display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; color:#758196; font-size:12px; }.status { text-transform:capitalize; border-radius:20px; background:#1b2638; color:#93c5fd; padding:3px 8px; font-size:10px; }.status-approved { color:#34d399; }.status-rejected { color:#f87171; }.status-escalated,.status-flagged_for_review { color:#fbbf24; }
+.primary-button,.secondary-button { border:1px solid var(--border); border-radius:8px; color:#e5e7eb; padding:9px 13px; background:#172235; }.primary-button { background:#2563eb; border-color:#2563eb; color:white; font-weight:700; }.primary-button:disabled,.secondary-button:disabled { opacity:.5; cursor:not-allowed; }.secondary-button:hover { background:#1c293c; }
+.reliability { position:sticky; top:94px; }.reliability-row { margin-top:20px; }.reliability-row>div:first-child { display:flex; align-items:center; justify-content:space-between; font-size:12px; }.reliability-row span { color:var(--muted); }.reliability-row strong { color:#60a5fa; }.bar { height:5px; background:#202a39; border-radius:5px; overflow:hidden; margin-top:8px; }.bar i { display:block; height:100%; background:#3b82f6; border-radius:5px; }
+.error,.notice { border-radius:9px; padding:12px 14px; margin:0 0 14px; background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); color:#fca5a5; font-size:13px; }.notice { background:rgba(59,130,246,.1); border-color:rgba(59,130,246,.25); color:#bfdbfe; }.empty,.loading-screen { padding:30px; text-align:center; color:var(--muted); }
+.modal-backdrop { position:fixed; inset:0; z-index:5; background:rgba(0,0,0,.72); display:grid; place-items:center; padding:20px; }.review-modal { background:#0f1623; border:1px solid var(--border); border-radius:16px; width:min(680px,100%); max-height:90vh; overflow:auto; padding:28px; position:relative; }.review-modal h2 { margin:5px 0; }.review-modal .eyebrow { margin:0 0 10px; }.close-button { position:absolute; right:16px; top:12px; background:none; border:0; color:white; font-size:27px; }.stack { display:flex; flex-direction:column; gap:14px; margin-top:16px; }.stack label { display:flex; flex-direction:column; gap:7px; color:#b5c0d0; font-size:12px; }.modal-actions { display:flex; flex-wrap:wrap; gap:8px; }.login-shell { min-height:100vh; display:grid; place-items:center; padding:22px; background:radial-gradient(ellipse at top,#142342,#090d14 60%); }.login-card { width:min(440px,100%); background:#0f1623; border:1px solid var(--border); border-radius:18px; padding:32px; box-shadow:0 20px 70px rgba(0,0,0,.35); }.login-card .brand { border:0; padding:0; margin-bottom:30px; }.login-card h1 { font-size:30px; margin:6px 0; }.login-card .eyebrow { margin:0; }.login-card .muted { line-height:1.5; }.login-card .primary-button { padding:12px; margin-top:4px; }.link-button { background:none; border:0; color:#60a5fa; padding:12px 0; }.demo-hint { color:#8290a5; font-size:11px; line-height:1.5; border-top:1px solid var(--border); padding-top:14px; }.small { font-size:10px!important; }
+@media (max-width:1000px) { .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.columns { grid-template-columns:1fr; }.reliability { position:static; } }
+@media (max-width:650px) { .sidebar { position:static; width:100%; height:auto; }.sidebar .eyebrow,.sidebar .nav-item,.side-bottom { display:none; }.workspace { margin:0; width:100%; }.app-shell { display:block; }.topbar { height:auto; padding:16px; flex-wrap:wrap; }.content { padding:16px; }.metrics,.metrics.two { grid-template-columns:1fr 1fr; gap:9px; }.metric { padding:14px; min-height:120px; }.metric strong { font-size:25px; }.filters { flex-direction:column; }.queue-row { flex-direction:column; }.row-actions { align-items:flex-start; flex-direction:row; }.user-chip { margin-left:0; }.topbar h1 { font-size:18px; } }
