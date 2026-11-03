@@ -145,10 +145,10 @@ streamlit run dashboard/app.py
 
 ## Contributors
 
-- [Tanvi Pushparaj]
-- [Harshithaa R]
-- [Gajula Rushika]
-- [Sonika Sugarkar]
+- Tanvi Pushparaj
+- Harshithaa R
+- Gajula Rushika
+- Sonika Sugarkar
 
 ## License
 
