@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
@@ -32,7 +32,7 @@ ACTIVE_TOKENS: Dict[str, Dict[str, str]] = {}
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
@@ -88,7 +88,8 @@ def _get_valid_token(credentials: Optional[HTTPAuthorizationCredentials]):
 
 @router.post("/login", response_model=TokenOut)
 def login_user(payload: LoginRequest):
-    user = DEMO_USERS.get(str(payload.email).lower())
+    email = str(payload.email).lower()
+    user = DEMO_USERS.get(email)
     if not user or user["password"] != payload.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
